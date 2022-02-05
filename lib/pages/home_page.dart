@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   CollectionReference _taskReference =
       FirebaseFirestore.instance.collection("tasks");
+
+  TextEditingController _titleController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
 
   List<Map<String, dynamic>> taskList = [];
 
@@ -28,7 +32,7 @@ class _HomePageState extends State<HomePage> {
 
         Map<String, dynamic> myMap = element.data() as Map<String, dynamic>;
         taskList.add(myMap);
-        print(myMap);
+        //print(myMap);
         /*print(element.id);
         print(myMap["title"]);
         print(myMap["description"]);
@@ -36,9 +40,7 @@ class _HomePageState extends State<HomePage> {
         print(myMap["count"]);
         print("x" * 30);*/
       });
-      setState(() {
-
-      });
+      setState(() {});
     });
   }
 
@@ -54,13 +56,14 @@ class _HomePageState extends State<HomePage> {
 
   void addDocument() {
     _taskReference.add({
-      "title": "Comprar disco",
-      "description": "Coolbox",
+      "title": _titleController.text,
+      "description": _descriptionController.text,
       "status": false,
     }).then((value) {
       print(value);
       print(value.id);
       print("datos registrados");
+      setState(() {});
     }).catchError((error) {
       print("Hubo un error");
     });
@@ -79,24 +82,68 @@ class _HomePageState extends State<HomePage> {
   }
 
   void updateDocument() {
-    _taskReference
-        .doc("A00001")
-        .update({
-          "description": "Saga Falabella",
-        })
-        .then((value) {
+    _taskReference.doc("A00001").update({
+      "description": "Saga Falabella",
+    }).then((value) {
       print("datos registrados");
+      setState(() {});
     }).catchError((error) {
       print("Hubo un error");
     });
   }
 
-  void deleteDocument(){
+  void deleteDocument() {
     _taskReference.doc("A00001").delete().then((value) {
       print("documento eliminado");
     }).catchError((error) {
       print("Hubo un error");
     });
+  }
+
+  showAddForm() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Agregar Tarea"),
+              const SizedBox(
+                height: 16.0,
+              ),
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  hintText: "Titulo",
+                ),
+              ),
+              const SizedBox(
+                height: 16.0,
+              ),
+              TextField(
+                controller: _descriptionController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: "Descripción",
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                addDocument();
+                Navigator.pop(context);
+              },
+              child: Text(
+                "Agregar",
+              ),
+            )
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -112,16 +159,41 @@ class _HomePageState extends State<HomePage> {
           //addDocument();
           //addDocumentId();
           //updateDocument();
-          deleteDocument();
+          //deleteDocument();
+          showAddForm();
         },
         child: Icon(Icons.add),
       ),
-      body: ListView.builder(
+      /*body: ListView.builder(
         itemCount: taskList.length,
         itemBuilder: (BuildContext context, int index){
           return ListTile(
             title: Text(taskList[index]["title"]),
             subtitle: Text(taskList[index]["description"]),
+          );
+        },
+      ),*/
+      body: FutureBuilder(
+        future: _taskReference.get(),
+        builder: (BuildContext context, AsyncSnapshot snap) {
+          //print(snap.connectionState);
+          if (snap.hasData) {
+            QuerySnapshot collection = snap.data;
+            //print(collection.docs);
+            return ListView.builder(
+              itemCount: collection.docs.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> myMap =
+                    collection.docs[index].data() as Map<String, dynamic>;
+                return ListTile(
+                  title: Text(myMap["title"]),
+                  subtitle: Text(myMap["description"]),
+                );
+              },
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
           );
         },
       ),

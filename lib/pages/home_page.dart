@@ -92,8 +92,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void deleteDocument() {
-    _taskReference.doc("A00001").delete().then((value) {
+  void deleteDocument(String id) {
+    _taskReference.doc(id).delete().then((value) {
       print("documento eliminado");
     }).catchError((error) {
       print("Hubo un error");
@@ -185,12 +185,15 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 Map<String, dynamic> myMap =
                     collection.docs[index].data() as Map<String, dynamic>;
+                myMap["id"] = collection.docs[index].id;
                 return Dismissible(
                   key: UniqueKey(),
                   background: Container(color: Colors.redAccent,),
                   direction: DismissDirection.startToEnd,
                   movementDuration: const Duration(seconds: 1),
                   onDismissed: (DismissDirection direction){
+                    print(myMap["id"]);
+                    deleteDocument(myMap["id"]);
                     print("${myMap["title"]} eliminado");
                   },
                   child: ListTile(

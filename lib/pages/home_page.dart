@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_codigo4_firebase_task/ui/widget/general_widget.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -15,12 +16,14 @@ class _HomePageState extends State<HomePage> {
 
   List<Map<String, dynamic>> taskList = [];
 
+  bool isLoading = false;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getData();
-    getTest();
+    //getTest();
   }
 
   getData() {
@@ -95,11 +98,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void updateDocument() {
-    _taskReference.doc("A00001").update({
-      "description": "Saga Falabella",
+  void updateDocument(String id, bool value) {
+    _taskReference.doc(id).update({
+      "status": value,
     }).then((value) {
-      print("datos registrados");
+      showSnackErrorMessage(
+        context, "check", "Datos actualizados",
+      );
+      isLoading = false;
       setState(() {});
     }).catchError((error) {
       print("Hubo un error");
@@ -108,9 +114,11 @@ class _HomePageState extends State<HomePage> {
 
   void deleteDocument(String id) {
     _taskReference.doc(id).delete().then((value) {
-      print("documento eliminado");
+      //print("documento eliminado");
     }).catchError((error) {
-      print("Hubo un error");
+      showSnackErrorMessage(
+        context, "error", "Ocurrió un error",
+      );
     });
   }
 
@@ -196,7 +204,7 @@ class _HomePageState extends State<HomePage> {
           if (snap.hasData) {
             QuerySnapshot collection = snap.data;
             //print(collection.docs);
-            return ListView.builder(
+            return !isLoading ? ListView.builder(
               itemCount: collection.docs.length,
               itemBuilder: (context, index) {
                 Map<String, dynamic> myMap =
@@ -212,18 +220,32 @@ class _HomePageState extends State<HomePage> {
                   onDismissed: (DismissDirection direction) {
                     print(myMap["id"]);
                     deleteDocument(myMap["id"]);
-                    print("${myMap["title"]} eliminado");
+                    showSnackErrorMessage(
+                      context, "check", "${myMap["title"]} se ha eliminado",
+                    );
                   },
                   child: ListTile(
-                      title: Text(myMap["title"]),
-                      subtitle: Text(myMap["description"]),
-                      trailing: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.check_circle),
-                        color: Colors.black26.withOpacity(0.2),
-                      )),
+                    title: Text(myMap["title"]),
+                    subtitle: Text(myMap["description"]),
+                    trailing: IconButton(
+                      onPressed: () {
+                        isLoading = true;
+                        setState(() {
+
+                        });
+                        myMap["status"] = !myMap["status"];
+                        updateDocument(myMap["id"], myMap["status"]);
+                      },
+                      icon: Icon(Icons.check_circle),
+                      color: myMap["status"]
+                          ? Colors.green
+                          : Colors.black26.withOpacity(0.2),
+                    ),
+                  ),
                 );
               },
+            ) : Center(
+              child: CircularProgressIndicator(),
             );
           }
           return Center(

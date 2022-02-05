@@ -1,9 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   CollectionReference _taskReference =
       FirebaseFirestore.instance.collection("tasks");
+
+  List<Map<String, dynamic>> taskList = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
+  }
 
   getData() {
     _taskReference.get().then((QuerySnapshot value) {
@@ -13,6 +27,7 @@ class HomePage extends StatelessWidget {
         //print(element.data());
 
         Map<String, dynamic> myMap = element.data() as Map<String, dynamic>;
+        taskList.add(myMap);
         print(myMap);
         /*print(element.id);
         print(myMap["title"]);
@@ -20,6 +35,9 @@ class HomePage extends StatelessWidget {
         print(myMap["status"]);
         print(myMap["count"]);
         print("x" * 30);*/
+      });
+      setState(() {
+
       });
     });
   }
@@ -98,7 +116,15 @@ class HomePage extends StatelessWidget {
         },
         child: Icon(Icons.add),
       ),
-      body: Center(),
+      body: ListView.builder(
+        itemCount: taskList.length,
+        itemBuilder: (BuildContext context, int index){
+          return ListTile(
+            title: Text(taskList[index]["title"]),
+            subtitle: Text(taskList[index]["description"]),
+          );
+        },
+      ),
     );
   }
 }

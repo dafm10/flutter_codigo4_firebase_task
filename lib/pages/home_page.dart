@@ -185,9 +185,18 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 Map<String, dynamic> myMap =
                     collection.docs[index].data() as Map<String, dynamic>;
-                return ListTile(
-                  title: Text(myMap["title"]),
-                  subtitle: Text(myMap["description"]),
+                return Dismissible(
+                  key: UniqueKey(),
+                  background: Container(color: Colors.redAccent,),
+                  direction: DismissDirection.startToEnd,
+                  movementDuration: const Duration(seconds: 1),
+                  onDismissed: (DismissDirection direction){
+                    print("${myMap["title"]} eliminado");
+                  },
+                  child: ListTile(
+                    title: Text(myMap["title"]),
+                    subtitle: Text(myMap["description"]),
+                  ),
                 );
               },
             );

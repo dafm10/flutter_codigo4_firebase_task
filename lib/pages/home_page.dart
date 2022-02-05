@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +20,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     getData();
+    getTest();
   }
 
   getData() {
@@ -44,6 +44,20 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  getTest() {
+    _taskReference.get().then((QuerySnapshot value) {
+      List<QueryDocumentSnapshot> titles = value.docs;
+      for (QueryDocumentSnapshot item in titles) {
+        Map<String, dynamic> myMap = item.data() as Map<String, dynamic>;
+        //print("imprimiendo ${myMap["title"]}");
+      }
+      value.docs.forEach((element) {
+        print(element.data());
+        print(element.id);
+      });
+    });
+  }
+
   void getDataId() {
     _taskReference.doc("AXn1cL1uzwoj76pVbIB2").get().then((value) {
       if (value.exists) {
@@ -60,8 +74,8 @@ class _HomePageState extends State<HomePage> {
       "description": _descriptionController.text,
       "status": false,
     }).then((value) {
-      print(value);
-      print(value.id);
+      //print(value);
+      //print(value.id);
       print("datos registrados");
       setState(() {});
     }).catchError((error) {
@@ -135,6 +149,8 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 addDocument();
                 Navigator.pop(context);
+                _titleController.clear();
+                _descriptionController.clear();
               },
               child: Text(
                 "Agregar",
@@ -188,18 +204,24 @@ class _HomePageState extends State<HomePage> {
                 myMap["id"] = collection.docs[index].id;
                 return Dismissible(
                   key: UniqueKey(),
-                  background: Container(color: Colors.redAccent,),
+                  background: Container(
+                    color: Colors.redAccent,
+                  ),
                   direction: DismissDirection.startToEnd,
                   movementDuration: const Duration(seconds: 1),
-                  onDismissed: (DismissDirection direction){
+                  onDismissed: (DismissDirection direction) {
                     print(myMap["id"]);
                     deleteDocument(myMap["id"]);
                     print("${myMap["title"]} eliminado");
                   },
                   child: ListTile(
-                    title: Text(myMap["title"]),
-                    subtitle: Text(myMap["description"]),
-                  ),
+                      title: Text(myMap["title"]),
+                      subtitle: Text(myMap["description"]),
+                      trailing: IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.check_circle),
+                        color: Colors.black26.withOpacity(0.2),
+                      )),
                 );
               },
             );

@@ -8,7 +8,36 @@ class HomeStreamPage extends StatefulWidget {
 }
 
 class _HomeStreamPageState extends State<HomeStreamPage> {
-  StreamController<String> _mandarinaStream = StreamController();
+
+  //StreamController<String> _mandarinaStream = StreamController();
+  StreamController<Map<String, dynamic>> _mandarinaStream = StreamController();
+
+  List<Map<String, dynamic>> mapList = [
+    {
+      "height": 30.0,
+      "width": 100.0,
+      "color": Colors.green,
+      "radius": 30.0,
+    },
+    {
+      "height": 10.0,
+      "width": 40.0,
+      "color": Colors.red,
+      "radius": 2.0,
+    },
+    {
+      "height": 100.0,
+      "width": 200.0,
+      "color": Colors.blue,
+      "radius": 100.0,
+    },
+    {
+      "height": 10.0,
+      "width": 40.0,
+      "color": Colors.yellow,
+      "radius": 20.0,
+    }
+  ];
 
   @override
   void initState() {
@@ -48,18 +77,20 @@ class _HomeStreamPageState extends State<HomeStreamPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _mandarinaStream.add("Hola muchachos");
+          //_mandarinaStream.add("Hola muchachos");
+          _mandarinaStream.add(mapList[0]);
         },
         child: Icon(Icons.add),
       ),
       appBar: AppBar(
         title: Text("Stream"),
         actions: [
-          IconButton(
-              onPressed: () {
-                _mandarinaStream.add("Actions!!!");
-              },
-              icon: Icon(Icons.add)),
+         /* IconButton(
+            onPressed: () {
+              _mandarinaStream.add("Actions!!!");
+            },
+            icon: Icon(Icons.add),
+          ),*/
         ],
       ),
       body: StreamBuilder(
@@ -67,8 +98,18 @@ class _HomeStreamPageState extends State<HomeStreamPage> {
         builder: (BuildContext context, AsyncSnapshot snap) {
           if (snap.hasData) {
             print(":::::::::::::::: ${snap.data}");
+            Map<String, dynamic> myMap = snap.data;
             return Center(
-              child: Text(snap.data),
+              //child: Text(snap.data.toString()),
+              child: AnimatedContainer(
+                width: myMap["width"],
+                height: myMap["height"],
+                duration: Duration(seconds: 2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(myMap["radius"]),
+                  color: myMap["color"],
+                ),
+              ),
             );
           }
           return Center(

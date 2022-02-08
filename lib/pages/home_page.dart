@@ -22,8 +22,8 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getData();
-    //getTest();
+    //getData();
+    getTest();
   }
 
   getData() {
@@ -48,15 +48,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   getTest() {
-    _taskReference.get().then((QuerySnapshot value) {
-      List<QueryDocumentSnapshot> titles = value.docs;
-      for (QueryDocumentSnapshot item in titles) {
-        Map<String, dynamic> myMap = item.data() as Map<String, dynamic>;
-        //print("imprimiendo ${myMap["title"]}");
-      }
+    _taskReference.orderBy('count').limit(2).get().then((value) {
       value.docs.forEach((element) {
         print(element.data());
-        print(element.id);
       });
     });
   }
@@ -80,7 +74,8 @@ class _HomePageState extends State<HomePage> {
       //print(value);
       //print(value.id);
       print("datos registrados");
-      setState(() {});
+      // al usar stream, no requerimos setState
+      //setState(() {});
     }).catchError((error) {
       print("Hubo un error");
     });
@@ -197,7 +192,7 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),*/
-      body: FutureBuilder(
+      /*body: FutureBuilder(
         future: _taskReference.get(),
         builder: (BuildContext context, AsyncSnapshot snap) {
           //print(snap.connectionState);
@@ -246,6 +241,23 @@ class _HomePageState extends State<HomePage> {
               },
             ) : Center(
               child: CircularProgressIndicator(),
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),*/
+      body: StreamBuilder(
+        stream: _taskReference.snapshots(),
+        builder: (BuildContext context,AsyncSnapshot snap){
+          if(snap.hasData){
+            QuerySnapshot collection = snap.data;
+            return ListView.builder(
+              itemCount: collection.docs.length,
+              itemBuilder: (context, index){
+                return Text(collection.docs[index]["title"]);
+              },
             );
           }
           return Center(

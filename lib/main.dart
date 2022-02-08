@@ -2,6 +2,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_codigo4_firebase_task/pages/home_page.dart';
+import 'package:flutter_codigo4_firebase_task/pages/home_stream_page.dart';
 
 void main()async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Firebase Task",
-      home: HomePage(),
+      home: HomeStreamPage(),
     );
   }
 }

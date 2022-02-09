@@ -87,8 +87,9 @@ class _HomeStreamPageState extends State<HomeStreamPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           //_mandarinaStream.add("Hola muchachos");
-          _mandarinaStream.add(mapList[counter]);
-          counter++;
+         // _mandarinaStream.add(mapList[counter]);
+            _mandarinaStream.add(imageList[counter]);
+            counter++;
         },
         child: Icon(Icons.add),
       ),
@@ -108,7 +109,7 @@ class _HomeStreamPageState extends State<HomeStreamPage> {
         builder: (BuildContext context, AsyncSnapshot snap) {
           if (snap.hasData) {
             print(":::::::::::::::: ${snap.data}");
-            Map<String, dynamic> myMap = snap.data;
+            /*Map<String, dynamic> myMap = snap.data;
             return Center(
               //child: Text(snap.data.toString()),
               child: AnimatedContainer(
@@ -120,6 +121,9 @@ class _HomeStreamPageState extends State<HomeStreamPage> {
                   color: myMap["color"],
                 ),
               ),
+            );*/
+            return Center(
+              child: snap.data,
             );
           }
           return Center(

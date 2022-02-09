@@ -10,7 +10,16 @@ class HomeStreamPage extends StatefulWidget {
 class _HomeStreamPageState extends State<HomeStreamPage> {
 
   //StreamController<String> _mandarinaStream = StreamController();
-  StreamController<Map<String, dynamic>> _mandarinaStream = StreamController();
+  //StreamController<Map<String, dynamic>> _mandarinaStream = StreamController();
+  StreamController<Image> _mandarinaStream = StreamController();
+
+  int counter = 0;
+
+  List<Image> imageList = [
+    Image.network("http://hp-api.herokuapp.com/images/harry.jpg"),
+    Image.network("http://hp-api.herokuapp.com/images/hermione.jpeg"),
+    Image.network("http://hp-api.herokuapp.com/images/ron.jpg"),
+  ];
 
   List<Map<String, dynamic>> mapList = [
     {
@@ -78,7 +87,8 @@ class _HomeStreamPageState extends State<HomeStreamPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           //_mandarinaStream.add("Hola muchachos");
-          _mandarinaStream.add(mapList[0]);
+          _mandarinaStream.add(mapList[counter]);
+          counter++;
         },
         child: Icon(Icons.add),
       ),
